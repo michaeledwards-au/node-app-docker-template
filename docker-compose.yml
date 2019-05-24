@@ -4,3 +4,5 @@ services:
     image: "node-image"
     ports:
       - "3000:3000"
+    environment:
+      - NODE_INDEX=$NODE_INDEX

@@ -1,8 +1,9 @@
 #!/bin/sh
 
-IMAGE=node-image
+export NODE_INDEX="index.js"
 
 build_clean() {
+  export NODE_INDEX=""
   echo
   echo \#\# Removing volumes and orphan containers...
   echo
@@ -10,46 +11,88 @@ build_clean() {
   echo
   echo \#\# Removing old images and cache...
   echo
-  docker image rm $IMAGE
+  docker image rm node-image
 }
 
 build_only() {
   echo
   echo \#\# Building image...
   echo
-  docker build -t $IMAGE .
+  docker build -t node-image .
+}
+
+build_stop() {
+  echo
+  echo \#\# Stopping app/script...
+  echo
+  docker-compose down
+}
+
+build_test() {
+  build_only
+  build_stop
+  echo
+  echo \#\# Running tests...
+  echo
+  export NODE_INDEX="test/index.js"
+  docker-compose up
 }
 
 build_run() {
   build_only
+  build_stop
   echo
-  echo \#\# Restarting services...
-  echo
-  docker-compose down
-  docker-compose up
+  if [ "$1" = "daemon" ]
+  then
+    echo \#\# Running script $1 as a daemon...
+    echo
+    export NODE_INDEX="$2"
+    docker-compose up -d
+  else
+    echo \#\# Running script $1...
+    echo
+    export NODE_INDEX="$1"
+    docker-compose up
+  fi
 }
 
-build_all() {
-  build_clean
+build_start() {
   build_only
-  build_run
+  build_stop
+  echo
+  if [ "$1" = "daemon" ]
+  then
+    echo \#\# Starting app as a daemon...
+    echo
+    docker-compose up -d
+  else
+    echo \#\# Starting app...
+    echo
+    docker-compose up
+  fi
 }
 
 main() {
   if [ "$1" = "clean" ]
   then
     build_clean
-  elif [ "$1" = "" ] || [ "$1" = "only" ]
+  elif [ "$1" = "only" ]
   then
     build_only
+  elif [ "$1" = "test" ]
+  then
+    build_test
+  elif [ "$1" = "start" ]
+  then
+    build_start $2
+  elif [ "$1" = "stop" ]
+  then
+    build_stop
   elif [ "$1" = "run" ]
   then
-    build_run
-  elif [ "$1" = "all" ]
-  then
-    build_all
+    build_run $2 $3
   fi
   echo
 }
 
-main $1
+main $1 $2

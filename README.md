@@ -4,18 +4,40 @@ Base template for building a Nodejs app with docker.
 
 ### Usage
 
-To clean the docker image
+#### Cleaning
+
+To clean the docker image:
 
 ```sh build clean```
 
-To build the docker image
+#### Building
 
-```sh build``` or ```sh build only```
+To build the docker image:
 
-To build and run
+```sh build only```
 
-```sh build run```
+#### Starting
 
-To clean, build and run
+To build the image and start the app:
 
-```sh build all```
+```sh build start```
+
+To build the image and start the app as a daemon:
+
+```sh build start daemon```
+
+#### Stopping
+
+To stop the app:
+
+```sh build stop```
+
+#### Running a script
+
+To build the docker and run script:
+
+```sh build run <path-to-script>```
+
+To build the docker and run script as a daemon:
+
+```sh build run daemon <path-to-script>```
