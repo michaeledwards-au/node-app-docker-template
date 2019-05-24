@@ -1,0 +1,55 @@
+#!/bin/sh
+
+IMAGE=node-image
+
+build_clean() {
+  echo
+  echo \#\# Removing volumes and orphan containers...
+  echo
+  docker-compose down --volumes --remove-orphans
+  echo
+  echo \#\# Removing old images and cache...
+  echo
+  docker image rm $IMAGE
+}
+
+build_only() {
+  echo
+  echo \#\# Building image...
+  echo
+  docker build -t $IMAGE .
+}
+
+build_run() {
+  build_only
+  echo
+  echo \#\# Restarting services...
+  echo
+  docker-compose down
+  docker-compose up
+}
+
+build_all() {
+  build_clean
+  build_only
+  build_run
+}
+
+main() {
+  if [ "$1" = "clean" ]
+  then
+    build_clean
+  elif [ "$1" = "" ] || [ "$1" = "only" ]
+  then
+    build_only
+  elif [ "$1" = "run" ]
+  then
+    build_run
+  elif [ "$1" = "all" ]
+  then
+    build_all
+  fi
+  echo
+}
+
+main $1
