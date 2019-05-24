@@ -2,7 +2,7 @@
 
 Base template for building a Nodejs app with docker.
 
-### Usage
+### How to use the build script
 
 #### Cleaning
 
